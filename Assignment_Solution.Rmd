@@ -1,0 +1,125 @@
+---
+title: "Hackathon 5/Assignment 6"
+date: "12/10/2020"
+output: html_document
+---
+
+# Instructions
+
+## Task I
+* You will be working in groups on a quantified student project
+* Download the Sensor Kinetics Pro app to your iOS or Android device (or similar gyroscope measuring app)
+* Split into subgroups with each subgroup investigating one measures available in the app
+* Each subgroup should report back after 20min with what they have learned
+
+## Task II
+* In consultation with your group select a physical activity that: a) can be measured using the app, b) has a concrete, sontinuous, countable outcome and c) some members of the group are experts and some are novices at - If you are looking for inspiration you can find previous student projects below.
+* Collect measurements for all members of the group performing the task using the app
+* Create a Github repo where you can store and share your data
+* Using K-means, can you identify the novices from the experts using only the app data?
+* Visualize your results using ggplot2
+
+```{r}
+
+# In our activity we did not specify who are the novices and who are the experts
+# Here is our methodology for this task: use K-means "using ONLY THE APP DATA" (as in the instruction)
+# This means that only variables X_Value Y_Value and Z-Value will enter the K-means calculation
+# From the results, we will see if the clusters have any correlation with #Jumps
+# Hypothesis is that "experts" will have jumped more than "novices" 
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+
+DF <- read.csv("jump_datagroup.csv")
+DF$ID <- c(1:8)
+DF1 <- select(DF, 4:6)
+DF2 <- data.frame(scale(DF1)) #scale data to be used in K-means
+
+# K-means data frame
+set.seed(7)
+fit <- kmeans(DF2, 2) # 2 clusters: experts/novices
+DF3 <- data.frame(DF2, fit$cluster)
+DF3$cluster <- as.factor(fit$cluster)
+DF3 <- DF3 %>% select(-fit.cluster)
+DF3$jumps <- DF$jumps
+DF3$id <- DF$ID
+DF3$names <- DF$id
+
+# Graph 1: See mean(#jumps) by cluster 
+# Cluster 2 (Dan, Daisy, Yen-Ling and Qianhui) jumped more on average than Cluster 1 (Amanda, Aniket, Junhao, Xinyuan)
+# It is a strong conclusion (for the weak data we have), but Cluster 2 is for Experts and 1 for Novices
+# The graphs below are generated for all X-Y-Z dimensions because it is had to know if participants held their cellphones in a consistent manner
+DF4 <- DF3 %>% group_by(cluster) %>% summarise(avgX = mean(X_value), avgY = mean(Y_value), avgZ = mean(Z_value), avgJ=mean(jumps))
+
+ggplot(DF4, aes(avgX, avgJ, colour = cluster)) + geom_point() + xlab("mean(max(X))") + ylab("mean(Jumps)") + ggtitle("Mean Jumps by Mean max(X), by cluster")
+ggplot(DF4, aes(avgY, avgJ, colour = cluster)) + geom_point() + xlab("mean(max(Y))") + ylab("mean(Jumps)") + ggtitle("Mean Jumps by Mean max(Y), by cluster")
+ggplot(DF4, aes(avgZ, avgJ, colour = cluster)) + geom_point() + xlab("mean(max(Z))") + ylab("mean(Jumps)") + ggtitle("Mean Jumps by Mean max(Z), by cluster")
+
+
+# Graph 2: Don't average across clusters. See all data points in graph : Stick to X dimension this time 
+ggplot(DF3, aes(X_value, jumps, colour = cluster, label=id)) + geom_point() + xlab("(max(X)") + ylab("#Jumps") + geom_smooth(method='lm',formula=y~x) + geom_text(aes(label=id),hjust=1, vjust=1.5, size=3) +  ggtitle("#Jumps by max(X), by cluster") + theme_minimal() 
+
+```
+
+
+## Task III
+* Devise five questions on a five point Likert scale that ask members of your group about their experience with your chosen task
+* Collect data from all members of your group
+* Run a PCA analysis on the data
+* What does PC1 represent in your analysis?
+* Visualize the PC1 results for each member of your group
+
+
+```{r}
+
+DFF <- select(DF, -c(1:6, 12))
+
+set.seed(7)
+pca <- prcomp(DFF, scale. = TRUE)
+summary(pca)
+
+plot(pca, type = "lines") 
+pca$rotation 
+pca$x
+
+# Inspect loadings 
+DFF2 <- as.data.frame(pca$rotation)
+
+    # PC1: -Q1, -Q4, -Q5, +Q3. It is hard to understand what it represents exactly. >PC1, >Jumps?
+    # Q1	I consider myself a great jumper
+    # Q2	How often do you exercise?
+    # Q3	Did you feel tired after jumping for 30 seconds?
+    # Q4	Do you have any health condition that makes jumping difficult?
+    # Q5	I consider exercising a joyful activity
+
+#PLOT
+jumpPC <- as.data.frame(pca$x)
+jumpPC$jump <- DF$jumps
+jumpPC$id <- DF$ID
+
+ggplot(jumpPC, aes(PC1, jump, label=id)) + geom_point() + xlab("PC1") + ylab("#Jumps in 30''") + geom_text(aes(label=id),hjust=1, vjust=1.5, size=3)+ geom_smooth(method='lm',formula=y~x) + ggtitle("#Jumps by PC1") 
+
+
+```
+
+
+## Task IV
+* If you could only choose one thing to predict the score for each member of your group (raw data variable, a cluster or a PC) what would it be and why?
+* Create a visualization that supports your conclusion
+* Based on your conclusion devise an intervention that would help novice members of your group improve their performance
+
+```{r}
+# Graph #jumps/PC1 by cluster
+jumpPC$cluster <- as.factor(DF3$cluster)
+
+ggplot(jumpPC, aes(PC1, jump, color=cluster, label=id)) + geom_point() + xlab("PC1") + ylab("#Jumps in 30''") + geom_smooth(method='lm',formula=y~x) + geom_text(aes(label=id),hjust=1, vjust=1.5, size=3) + ggtitle("#Jumps by PC1 by cluster")
+
+# What's better? (cluster, PC, raw data):
+# Devise intervention: 
+
+```
+
+## Task V
+* Submit a link to your Github repo containing your data, code, visualizations and conclusions to charles.lang@tc.columbia.edu by 5pm EDT 12/14/20.
