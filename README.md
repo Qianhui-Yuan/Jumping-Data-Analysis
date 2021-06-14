@@ -35,6 +35,9 @@
 4. Data wrangling: using Excel to tidy up the data collected
 5. Data analysis: Using K-means to identify the novices from the experts and run a PCA analysis on the data
 6. Visualization
-
-
-
+![Kmeans1](https://github.com/Qianhui-Yuan/Jumping-Data-Analysis/blob/d2d8004bae7555884d4c69f2e3fa239fda4e8d3f/visualization%20results/Kmeans1.png "github")
+![Kmeans2](https://github.com/Qianhui-Yuan/Jumping-Data-Analysis/blob/d2d8004bae7555884d4c69f2e3fa239fda4e8d3f/visualization%20results/Kmeans2.png "github")
+![Kmeans3](https://github.com/Qianhui-Yuan/Jumping-Data-Analysis/blob/d2d8004bae7555884d4c69f2e3fa239fda4e8d3f/visualization%20results/Kmeans3.png "github")
+![Kmeans4](https://github.com/Qianhui-Yuan/Jumping-Data-Analysis/blob/d2d8004bae7555884d4c69f2e3fa239fda4e8d3f/visualization%20results/Kmeans4.png "github")
+![PCA%201](https://github.com/Qianhui-Yuan/Jumping-Data-Analysis/blob/d2d8004bae7555884d4c69f2e3fa239fda4e8d3f/visualization%20results/PCA%201.png "github")
+![PCA%202](https://github.com/Qianhui-Yuan/Jumping-Data-Analysis/blob/d2d8004bae7555884d4c69f2e3fa239fda4e8d3f/visualization%20results/PCA%202.png "github")
